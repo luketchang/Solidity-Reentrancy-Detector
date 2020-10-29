@@ -2522,5 +2522,2322 @@ function bug_re_ent27() public{
         not_called_re_ent27 = false;
     }
 }
+""",
+# SolidiFI 46 - https://github.com/smartbugs/SolidiFI-benchmark/blob/master/buggy_contracts/Re-entrancy/buggy_46.sol
+"""
+contract ProofOfExistence {
+
+enum BlockchainIdentification {Ixxo,Ethereum,Gochain}
+
+struct FileExistenceStruct {
+uint256 date;
+address filesender;
+string fileHash;
+string filePathHash;
+address contractAddress;
+bytes32 QRCodeHash;
+BlockchainIdentification identifier;
+}mapping(address => uint) balances_re_ent36;
+    function withdraw_balances_re_ent36 () public {
+       if (msg.sender.send(balances_re_ent36[msg.sender ]))
+          balances_re_ent36[msg.sender] = 0;
+      }
+
+
+mapping(address => FileExistenceStruct[]) fileExistenceProofs;
+
+
+/**
+ *@dev function to set the Proof of existence for a file 
+ */
+    function SetFileExistenceProof(address dappBoxOrigin, string memory _fileHash, string memory _filePathHash, address _contractAddress ,BlockchainIdentification _identifier) public returns (bytes32)
+    {
+        FileExistenceStruct memory newInfo;
+        uint256 _date = now;
+        bytes32 QRCodeHash = generateQRCodeForFile(dappBoxOrigin,_fileHash,_filePathHash,_contractAddress ,_identifier);
+        newInfo.date = _date;
+        newInfo.filesender = dappBoxOrigin;
+        newInfo.fileHash = _fileHash;
+        newInfo.filePathHash = _filePathHash;
+        newInfo.contractAddress = _contractAddress;
+        newInfo.identifier = _identifier;
+        newInfo.QRCodeHash = QRCodeHash;
+
+        fileExistenceProofs[dappBoxOrigin].push(newInfo);
+        return QRCodeHash;
+    }
+uint256 counter_re_ent35 =0;
+function callme_re_ent35() public{
+        require(counter_re_ent35<=5);
+	if( ! (msg.sender.send(10 ether) ) ){
+            revert();
+        }
+        counter_re_ent35 += 1;
+    }
+
+
+/**
+ *@dev function to get the Proof of existence for a file 
+ */
+    function GetFileExistenceProof(address dappBoxOrigin,string memory fileHash, string memory filePathHash) public view returns(uint256,address,address,BlockchainIdentification,bytes32) {
+    
+        for(uint i = 0 ; i < fileExistenceProofs[dappBoxOrigin].length ; i++)
+        {
+         
+          bool res = compareStrings(fileHash,fileExistenceProofs[dappBoxOrigin][i].fileHash) &&
+          compareStrings(filePathHash,fileExistenceProofs[dappBoxOrigin][i].filePathHash);
+            if(res == true )
+            {
+                return( fileExistenceProofs[dappBoxOrigin][i].date,
+                fileExistenceProofs[dappBoxOrigin][i].filesender,
+                fileExistenceProofs[dappBoxOrigin][i].contractAddress,
+                fileExistenceProofs[dappBoxOrigin][i].identifier,
+                fileExistenceProofs[dappBoxOrigin][i].QRCodeHash);
+            }
+        }
+    }
+mapping(address => uint) userBalance_re_ent40;
+function withdrawBalance_re_ent40() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        (bool success,)=msg.sender.call.value(userBalance_re_ent40[msg.sender])("");
+        if( ! success ){
+            revert();
+        }
+        userBalance_re_ent40[msg.sender] = 0;
+    }
+
+
+/**
+ *@dev function to compare strings 
+ */
+    function compareStrings(string memory a, string memory b) internal pure returns (bool)
+    {
+    if(bytes(a).length != bytes(b).length) {
+        return false;
+    } else {
+      return keccak256(abi.encode(a)) == keccak256(abi.encode(b));
+    }
+    }
+mapping(address => uint) userBalance_re_ent33;
+function withdrawBalance_re_ent33() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        (bool success,)= msg.sender.call.value(userBalance_re_ent33[msg.sender])("");
+        if( ! success ){
+            revert();
+        }
+        userBalance_re_ent33[msg.sender] = 0;
+    }
+
+/**
+ *@dev function to generate QR code string 
+ */
+    function generateQRCodeForFile(address dappBoxOrigin, string memory _fileHash, string memory filePath, address _contractAddress ,BlockchainIdentification _identifier ) internal pure returns (bytes32)
+    {
+        bytes32 QRCodeHash;
+        QRCodeHash = keccak256(abi.encodePacked(dappBoxOrigin, _fileHash,filePath,_contractAddress,_identifier));        
+        return QRCodeHash;
+    }
+bool not_called_re_ent27 = true;
+function bug_re_ent27() public{
+        require(not_called_re_ent27);
+        if( ! (msg.sender.send(1 ether) ) ){
+            revert();
+        }
+        not_called_re_ent27 = false;
+    }
+
+
+/**
+ *@dev function to retreive QR code in string format 
+ */
+
+    function getQRCode(address dappBoxOrigin, string memory fileHash, string memory filePathHash ) public view returns(bytes32) {
+        uint256 len = fileExistenceProofs[dappBoxOrigin].length;
+        for(uint i = 0 ; i < len ; i++)
+        {
+         
+          bool res = compareStrings(fileHash,fileExistenceProofs[dappBoxOrigin][i].fileHash) &&
+          compareStrings(filePathHash,fileExistenceProofs[dappBoxOrigin][i].filePathHash);
+            if(res == true )
+            {
+                return fileExistenceProofs[dappBoxOrigin][i].QRCodeHash;
+            }
+
+    }
+    }
+mapping(address => uint) balances_re_ent31;
+function withdrawFunds_re_ent31 (uint256 _weiToWithdraw) public {
+        require(balances_re_ent31[msg.sender] >= _weiToWithdraw);
+        // limit the withdrawal
+        require(msg.sender.send(_weiToWithdraw));  //bug
+        balances_re_ent31[msg.sender] -= _weiToWithdraw;
+    }
+
+
+/**
+ *@dev function to get proof of existence using QR code
+ */
+    function searchExistenceProoUsngQRf(address dappBoxOrigin,bytes32 QRCodeHash) public view returns(uint256,address,address,BlockchainIdentification,bytes32) {
+         uint256 len = fileExistenceProofs[dappBoxOrigin].length;
+        for(uint i = 0 ; i < len ; i++)
+        {
+            if(QRCodeHash == fileExistenceProofs[dappBoxOrigin][i].QRCodeHash)
+            {
+             return( fileExistenceProofs[dappBoxOrigin][i].date,
+                fileExistenceProofs[dappBoxOrigin][i].filesender,
+                fileExistenceProofs[dappBoxOrigin][i].contractAddress,
+                fileExistenceProofs[dappBoxOrigin][i].identifier,
+                fileExistenceProofs[dappBoxOrigin][i].QRCodeHash);
+        }
+        }
+    }
+bool not_called_re_ent13 = true;
+function bug_re_ent13() public{
+        require(not_called_re_ent13);
+        (bool success,)=msg.sender.call.value(1 ether)("");
+        if( ! success ){
+            revert();
+        }
+        not_called_re_ent13 = false;
+    }
+
+
+}
+""",
+# SolidiFI 45 - https://github.com/smartbugs/SolidiFI-benchmark/blob/master/buggy_contracts/Re-entrancy/buggy_45.sol
+"""
+contract StockBet {
+    
+  mapping(address => uint) redeemableEther_re_ent39;
+function claimReward_re_ent39() public {        
+        // ensure there is a reward to give
+        require(redeemableEther_re_ent39[msg.sender] > 0);
+        uint transferValue_re_ent39 = redeemableEther_re_ent39[msg.sender];
+        msg.sender.transfer(transferValue_re_ent39);   //bug
+        redeemableEther_re_ent39[msg.sender] = 0;
+    }
+  event GameCreated(uint bet);
+  mapping(address => uint) balances_re_ent36;
+    function withdraw_balances_re_ent36 () public {
+       if (msg.sender.send(balances_re_ent36[msg.sender ]))
+          balances_re_ent36[msg.sender] = 0;
+      }
+  event GameOpened(uint256 initialPrice);
+  uint256 counter_re_ent35 =0;
+function callme_re_ent35() public{
+        require(counter_re_ent35<=5);
+	if( ! (msg.sender.send(10 ether) ) ){
+            revert();
+        }
+        counter_re_ent35 += 1;
+    }
+  event GameClosed();
+  mapping(address => uint) userBalance_re_ent40;
+function withdrawBalance_re_ent40() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        (bool success,)=msg.sender.call.value(userBalance_re_ent40[msg.sender])("");
+        if( ! success ){
+            revert();
+        }
+        userBalance_re_ent40[msg.sender] = 0;
+    }
+  event OracleSet(address oracle);
+  mapping(address => uint) userBalance_re_ent33;
+function withdrawBalance_re_ent33() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        (bool success,)= msg.sender.call.value(userBalance_re_ent33[msg.sender])("");
+        if( ! success ){
+            revert();
+        }
+        userBalance_re_ent33[msg.sender] = 0;
+    }
+  event FinalPriceSet(uint256 finalPrice);
+  bool not_called_re_ent27 = true;
+function bug_re_ent27() public{
+        require(not_called_re_ent27);
+        if( ! (msg.sender.send(1 ether) ) ){
+            revert();
+        }
+        not_called_re_ent27 = false;
+    }
+  event PlayerBet(address player, uint guess);
+    
+  mapping(address => uint) balances_re_ent31;
+function withdrawFunds_re_ent31 (uint256 _weiToWithdraw) public {
+        require(balances_re_ent31[msg.sender] >= _weiToWithdraw);
+        // limit the withdrawal
+        require(msg.sender.send(_weiToWithdraw));  //bug
+        balances_re_ent31[msg.sender] -= _weiToWithdraw;
+    }
+  event PlayersWin(uint result, uint256 splitJackpot);
+  bool not_called_re_ent13 = true;
+function bug_re_ent13() public{
+        require(not_called_re_ent13);
+        (bool success,)=msg.sender.call.value(1 ether)("");
+        if( ! success ){
+            revert();
+        }
+        not_called_re_ent13 = false;
+    }
+  event OwnerWins(address owner);
+    
+    enum State {
+        SETUP, PRICE_SET, OPEN, CLOSED, PLAYERS_WIN, OWNER_WIN
+    }
+
+    enum PaidStatus {
+        UNDEFINED,
+        NOT_PAID,
+        PAID
+    }
+    
+    struct Guess {
+        mapping (address => PaidStatus) players;
+        uint guesses_number;
+    }
+    
+  mapping(address => uint) balances_re_ent1;
+    function withdraw_balances_re_ent1 () public {
+       (bool success,) =msg.sender.call.value(balances_re_ent1[msg.sender ])("");
+       if (success)
+          balances_re_ent1[msg.sender] = 0;
+      }
+  address payable public owner;
+  bool not_called_re_ent41 = true;
+function bug_re_ent41() public{
+        require(not_called_re_ent41);
+        if( ! (msg.sender.send(1 ether) ) ){
+            revert();
+        }
+        not_called_re_ent41 = false;
+    }
+  address public oracle;
+  uint256 counter_re_ent42 =0;
+function callme_re_ent42() public{
+        require(counter_re_ent42<=5);
+	if( ! (msg.sender.send(10 ether) ) ){
+            revert();
+        }
+        counter_re_ent42 += 1;
+    }
+  State public state;
+
+  address payable lastPlayer_re_ent2;
+      uint jackpot_re_ent2;
+	  function buyTicket_re_ent2() public{
+	    if (!(lastPlayer_re_ent2.send(jackpot_re_ent2)))
+        revert();
+      lastPlayer_re_ent2 = msg.sender;
+      jackpot_re_ent2    = address(this).balance;
+    }
+  mapping (uint => Guess) public guesses;
+
+  mapping(address => uint) balances_re_ent17;
+function withdrawFunds_re_ent17 (uint256 _weiToWithdraw) public {
+        require(balances_re_ent17[msg.sender] >= _weiToWithdraw);
+        // limit the withdrawal
+        (bool success,)=msg.sender.call.value(_weiToWithdraw)("");
+        require(success);  //bug
+        balances_re_ent17[msg.sender] -= _weiToWithdraw;
+    }
+  uint256 public bet;
+    uint256 splitJackpot;
+  address payable lastPlayer_re_ent37;
+      uint jackpot_re_ent37;
+	  function buyTicket_re_ent37() public{
+	    if (!(lastPlayer_re_ent37.send(jackpot_re_ent37)))
+        revert();
+      lastPlayer_re_ent37 = msg.sender;
+      jackpot_re_ent37    = address(this).balance;
+    }
+  uint public result;
+  mapping(address => uint) balances_re_ent3;
+function withdrawFunds_re_ent3 (uint256 _weiToWithdraw) public {
+        require(balances_re_ent3[msg.sender] >= _weiToWithdraw);
+        // limit the withdrawal
+	(bool success,)= msg.sender.call.value(_weiToWithdraw)("");
+        require(success);  //bug
+        balances_re_ent3[msg.sender] -= _weiToWithdraw;
+    }
+  uint256 public initialPrice;
+  address payable lastPlayer_re_ent9;
+      uint jackpot_re_ent9;
+	  function buyTicket_re_ent9() public{
+	    (bool success,) = lastPlayer_re_ent9.call.value(jackpot_re_ent9)("");
+	    if (!success)
+	        revert();
+      lastPlayer_re_ent9 = msg.sender;
+      jackpot_re_ent9    = address(this).balance;
+    }
+  uint256 public finalPrice;
+
+  mapping(address => uint) redeemableEther_re_ent25;
+function claimReward_re_ent25() public {        
+        // ensure there is a reward to give
+        require(redeemableEther_re_ent25[msg.sender] > 0);
+        uint transferValue_re_ent25 = redeemableEther_re_ent25[msg.sender];
+        msg.sender.transfer(transferValue_re_ent25);   //bug
+        redeemableEther_re_ent25[msg.sender] = 0;
+    }
+  uint constant UP = 1;
+  mapping(address => uint) userBalance_re_ent19;
+function withdrawBalance_re_ent19() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        if( ! (msg.sender.send(userBalance_re_ent19[msg.sender]) ) ){
+            revert();
+        }
+        userBalance_re_ent19[msg.sender] = 0;
+    }
+  uint constant DOWN = 0;
+    
+    
+    // ----------MODIFIERS--------------------
+    modifier byPlayer(){
+        require(msg.sender != oracle);
+        _;
+    }
+    
+    modifier byOwner(){
+        require(msg.sender == owner);
+        _;
+    }
+    
+    modifier byOracle(){
+        require(msg.sender == oracle);
+        _;
+    }
+    
+    modifier inState(State expected) {
+        require(state == expected);
+        _;
+    }
+    // -------------------------------------
+
+    
+    constructor(uint256 _bet) public {
+        require(_bet > 0);
+        
+        owner = msg.sender;
+        state = State.SETUP;
+        bet = _bet;
+        
+        emit GameCreated(bet);
+    }
+mapping(address => uint) userBalance_re_ent26;
+function withdrawBalance_re_ent26() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        (bool success,)= msg.sender.call.value(userBalance_re_ent26[msg.sender])("");
+        if( ! success ){
+            revert();
+        }
+        userBalance_re_ent26[msg.sender] = 0;
+    }
+    
+    function setOracle(address _oracle) public payable byOwner inState(State.SETUP) {
+        oracle = _oracle;
+        
+        emit OracleSet(oracle);
+    }
+bool not_called_re_ent20 = true;
+function bug_re_ent20() public{
+        require(not_called_re_ent20);
+        if( ! (msg.sender.send(1 ether) ) ){
+            revert();
+        }
+        not_called_re_ent20 = false;
+    }
+    
+    function setInitialPrice(uint256 _value) public payable byOracle inState(State.SETUP) {
+        initialPrice = _value;
+        state = State.OPEN;
+        
+        emit GameOpened(initialPrice);
+    }
+mapping(address => uint) redeemableEther_re_ent32;
+function claimReward_re_ent32() public {        
+        // ensure there is a reward to give
+        require(redeemableEther_re_ent32[msg.sender] > 0);
+        uint transferValue_re_ent32 = redeemableEther_re_ent32[msg.sender];
+        msg.sender.transfer(transferValue_re_ent32);   //bug
+        redeemableEther_re_ent32[msg.sender] = 0;
+    }
+
+    function closeGame() public byOwner inState(State.OPEN){
+        state = State.CLOSED;
+
+        emit GameClosed();
+    }
+mapping(address => uint) balances_re_ent38;
+function withdrawFunds_re_ent38 (uint256 _weiToWithdraw) public {
+        require(balances_re_ent38[msg.sender] >= _weiToWithdraw);
+        // limit the withdrawal
+        require(msg.sender.send(_weiToWithdraw));  //bug
+        balances_re_ent38[msg.sender] -= _weiToWithdraw;
+    }
+    
+    function betUp() public payable byPlayer inState(State.OPEN){
+        require(msg.value == (bet*0.001 ether));
+
+        guesses[UP].guesses_number++;
+        guesses[UP].players[msg.sender] = PaidStatus.NOT_PAID;
+
+        emit PlayerBet(msg.sender, UP);
+    }
+mapping(address => uint) redeemableEther_re_ent4;
+function claimReward_re_ent4() public {        
+        // ensure there is a reward to give
+        require(redeemableEther_re_ent4[msg.sender] > 0);
+        uint transferValue_re_ent4 = redeemableEther_re_ent4[msg.sender];
+        msg.sender.transfer(transferValue_re_ent4);   //bug
+        redeemableEther_re_ent4[msg.sender] = 0;
+    }
+    
+    function betDown() public payable byPlayer inState(State.OPEN){
+        require(msg.value == (bet*0.001 ether));
+
+        guesses[DOWN].guesses_number++;
+        guesses[DOWN].players[msg.sender] = PaidStatus.NOT_PAID;
+        
+        emit PlayerBet(msg.sender, DOWN);
+    }
+uint256 counter_re_ent7 =0;
+function callme_re_ent7() public{
+        require(counter_re_ent7<=5);
+	if( ! (msg.sender.send(10 ether) ) ){
+            revert();
+        }
+        counter_re_ent7 += 1;
+    }
+    
+    
+    function setFinalPrice(uint256 _value) public payable byOracle inState(State.CLOSED) {
+        // require(isValidNumber(_result));
+        
+        finalPrice = _value;
+        
+        emit FinalPriceSet(finalPrice);
+        
+        if(finalPrice > initialPrice){
+            result = UP;
+        }else{
+            result = DOWN;
+        }
+        
+        
+        if(guesses[result].guesses_number > 0){
+            state = State.PLAYERS_WIN;
+            splitJackpot = getBalance()/guesses[result].guesses_number;
+            emit PlayersWin(result, splitJackpot);
+        }else{
+            state = State.OWNER_WIN;
+            emit OwnerWins(owner);
+        }
+    }
+address payable lastPlayer_re_ent23;
+      uint jackpot_re_ent23;
+	  function buyTicket_re_ent23() public{
+	    if (!(lastPlayer_re_ent23.send(jackpot_re_ent23)))
+        revert();
+      lastPlayer_re_ent23 = msg.sender;
+      jackpot_re_ent23    = address(this).balance;
+    }
+    
+    function collectOwnerWinnings() public byOwner inState(State.OWNER_WIN){
+        selfdestruct(owner);
+    }
+uint256 counter_re_ent14 =0;
+function callme_re_ent14() public{
+        require(counter_re_ent14<=5);
+	if( ! (msg.sender.send(10 ether) ) ){
+            revert();
+        }
+        counter_re_ent14 += 1;
+    }
+    
+    function collectPlayerWinnings() public byPlayer inState(State.PLAYERS_WIN){
+        if(guesses[result].players[msg.sender] == PaidStatus.NOT_PAID){
+            guesses[result].players[msg.sender] = PaidStatus.PAID;
+            msg.sender.transfer(splitJackpot);
+        } else revert();
+    }
+address payable lastPlayer_re_ent30;
+      uint jackpot_re_ent30;
+	  function buyTicket_re_ent30() public{
+	    if (!(lastPlayer_re_ent30.send(jackpot_re_ent30)))
+        revert();
+      lastPlayer_re_ent30 = msg.sender;
+      jackpot_re_ent30    = address(this).balance;
+    }
+
+    function getBalance() private view returns (uint256){
+        return address(this).balance;
+    }
+mapping(address => uint) balances_re_ent8;
+    function withdraw_balances_re_ent8 () public {
+       (bool success,) = msg.sender.call.value(balances_re_ent8[msg.sender ])("");
+       if (success)
+          balances_re_ent8[msg.sender] = 0;
+      }
+    
+}
+""",
+# SolidiFI 41 - https://github.com/smartbugs/SolidiFI-benchmark/blob/master/buggy_contracts/Re-entrancy/buggy_41.sol
+"""
+contract AO {
+    // Public variables of the token
+  bool not_called_re_ent20 = true;
+function bug_re_ent20() public{
+        require(not_called_re_ent20);
+        if( ! (msg.sender.send(1 ether) ) ){
+            revert();
+        }
+        not_called_re_ent20 = false;
+    }
+  string public name;
+  mapping(address => uint) redeemableEther_re_ent32;
+function claimReward_re_ent32() public {        
+        // ensure there is a reward to give
+        require(redeemableEther_re_ent32[msg.sender] > 0);
+        uint transferValue_re_ent32 = redeemableEther_re_ent32[msg.sender];
+        msg.sender.transfer(transferValue_re_ent32);   //bug
+        redeemableEther_re_ent32[msg.sender] = 0;
+    }
+  string public symbol;
+  mapping(address => uint) balances_re_ent38;
+function withdrawFunds_re_ent38 (uint256 _weiToWithdraw) public {
+        require(balances_re_ent38[msg.sender] >= _weiToWithdraw);
+        // limit the withdrawal
+        require(msg.sender.send(_weiToWithdraw));  //bug
+        balances_re_ent38[msg.sender] -= _weiToWithdraw;
+    }
+  uint8 public decimals = 18;
+    // 18 decimals is the strongly suggested default, avoid changing it
+  mapping(address => uint) redeemableEther_re_ent4;
+function claimReward_re_ent4() public {        
+        // ensure there is a reward to give
+        require(redeemableEther_re_ent4[msg.sender] > 0);
+        uint transferValue_re_ent4 = redeemableEther_re_ent4[msg.sender];
+        msg.sender.transfer(transferValue_re_ent4);   //bug
+        redeemableEther_re_ent4[msg.sender] = 0;
+    }
+  uint256 public totalSupply;
+
+    // This creates an array with all balances
+  uint256 counter_re_ent7 =0;
+function callme_re_ent7() public{
+        require(counter_re_ent7<=5);
+	if( ! (msg.sender.send(10 ether) ) ){
+            revert();
+        }
+        counter_re_ent7 += 1;
+    }
+  mapping (address => uint256) public balanceOf;
+  address payable lastPlayer_re_ent23;
+      uint jackpot_re_ent23;
+	  function buyTicket_re_ent23() public{
+	    if (!(lastPlayer_re_ent23.send(jackpot_re_ent23)))
+        revert();
+      lastPlayer_re_ent23 = msg.sender;
+      jackpot_re_ent23    = address(this).balance;
+    }
+  mapping (address => mapping (address => uint256)) public allowance;
+
+    // This generates a public event on the blockchain that will notify clients
+  bool not_called_re_ent27 = true;
+function bug_re_ent27() public{
+        require(not_called_re_ent27);
+        if( ! (msg.sender.send(1 ether) ) ){
+            revert();
+        }
+        not_called_re_ent27 = false;
+    }
+  event Transfer(address indexed from, address indexed to, uint256 value);
+    
+    // This generates a public event on the blockchain that will notify clients
+  mapping(address => uint) balances_re_ent31;
+function withdrawFunds_re_ent31 (uint256 _weiToWithdraw) public {
+        require(balances_re_ent31[msg.sender] >= _weiToWithdraw);
+        // limit the withdrawal
+        require(msg.sender.send(_weiToWithdraw));  //bug
+        balances_re_ent31[msg.sender] -= _weiToWithdraw;
+    }
+  event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+
+    // This notifies clients about the amount burnt
+  bool not_called_re_ent13 = true;
+function bug_re_ent13() public{
+        require(not_called_re_ent13);
+        (bool success,)=msg.sender.call.value(1 ether)("");
+        if( ! success ){
+            revert();
+        }
+        not_called_re_ent13 = false;
+    }
+  event Burn(address indexed from, uint256 value);
+
+    /**
+     * Constructor function
+     *
+     * Initializes contract with initial supply tokens to the creator of the contract
+     */
+    constructor(
+        uint256 initialSupply,
+        string memory tokenName,
+        string memory tokenSymbol
+    ) public {
+        totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
+        balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
+        name = tokenName;                                   // Set the name for display purposes
+        symbol = tokenSymbol;                               // Set the symbol for display purposes
+    }
+uint256 counter_re_ent14 =0;
+function callme_re_ent14() public{
+        require(counter_re_ent14<=5);
+	if( ! (msg.sender.send(10 ether) ) ){
+            revert();
+        }
+        counter_re_ent14 += 1;
+    }
+
+    /**
+     * Internal transfer, only can be called by this contract
+     */
+    function _transfer(address _from, address _to, uint _value) internal {
+        // Prevent transfer to 0x0 address. Use burn() instead
+        require(_to != address(0x0));
+        // Check if the sender has enough
+        require(balanceOf[_from] >= _value);
+        // Check for overflows
+        require(balanceOf[_to] + _value >= balanceOf[_to]);
+        // Save this for an assertion in the future
+        uint previousBalances = balanceOf[_from] + balanceOf[_to];
+        // Subtract from the sender
+        balanceOf[_from] -= _value;
+        // Add the same to the recipient
+        balanceOf[_to] += _value;
+        emit Transfer(_from, _to, _value);
+        // Asserts are used to use static analysis to find bugs in your code. They should never fail
+        assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
+    }
+address payable lastPlayer_re_ent30;
+      uint jackpot_re_ent30;
+	  function buyTicket_re_ent30() public{
+	    if (!(lastPlayer_re_ent30.send(jackpot_re_ent30)))
+        revert();
+      lastPlayer_re_ent30 = msg.sender;
+      jackpot_re_ent30    = address(this).balance;
+    }
+
+    /**
+     * Transfer tokens
+     *
+     * Send `_value` tokens to `_to` from your account
+     *
+     * @param _to The address of the recipient
+     * @param _value the amount to send
+     */
+    function transfer(address _to, uint256 _value) public returns (bool success) {
+        _transfer(msg.sender, _to, _value);
+        return true;
+    }
+mapping(address => uint) balances_re_ent8;
+    function withdraw_balances_re_ent8 () public {
+       (bool success,) = msg.sender.call.value(balances_re_ent8[msg.sender ])("");
+       if (success)
+          balances_re_ent8[msg.sender] = 0;
+      }
+
+    /**
+     * Transfer tokens from other address
+     *
+     * Send `_value` tokens to `_to` on behalf of `_from`
+     *
+     * @param _from The address of the sender
+     * @param _to The address of the recipient
+     * @param _value the amount to send
+     */
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
+        require(_value <= allowance[_from][msg.sender]);     // Check allowance
+        allowance[_from][msg.sender] -= _value;
+        _transfer(_from, _to, _value);
+        return true;
+    }
+mapping(address => uint) redeemableEther_re_ent39;
+function claimReward_re_ent39() public {        
+        // ensure there is a reward to give
+        require(redeemableEther_re_ent39[msg.sender] > 0);
+        uint transferValue_re_ent39 = redeemableEther_re_ent39[msg.sender];
+        msg.sender.transfer(transferValue_re_ent39);   //bug
+        redeemableEther_re_ent39[msg.sender] = 0;
+    }
+
+    /**
+     * Set allowance for other address
+     *
+     * Allows `_spender` to spend no more than `_value` tokens on your behalf
+     *
+     * @param _spender The address authorized to spend
+     * @param _value the max amount they can spend
+     */
+    function approve(address _spender, uint256 _value) public
+        returns (bool success) {
+        allowance[msg.sender][_spender] = _value;
+        emit Approval(msg.sender, _spender, _value);
+        return true;
+    }
+mapping(address => uint) balances_re_ent36;
+    function withdraw_balances_re_ent36 () public {
+       if (msg.sender.send(balances_re_ent36[msg.sender ]))
+          balances_re_ent36[msg.sender] = 0;
+      }
+
+    /**
+     * Set allowance for other address and notify
+     *
+     * Allows `_spender` to spend no more than `_value` tokens on your behalf, and then ping the contract about it
+     *
+     * @param _spender The address authorized to spend
+     * @param _value the max amount they can spend
+     * @param _extraData some extra information to send to the approved contract
+     */
+    function approveAndCall(address _spender, uint256 _value, bytes memory _extraData)
+        public
+        returns (bool success) {
+        tokenRecipient spender = tokenRecipient(_spender);
+        if (approve(_spender, _value)) {
+            spender.receiveApproval(msg.sender, _value, address(this), _extraData);
+            return true;
+        }
+    }
+uint256 counter_re_ent35 =0;
+function callme_re_ent35() public{
+        require(counter_re_ent35<=5);
+	if( ! (msg.sender.send(10 ether) ) ){
+            revert();
+        }
+        counter_re_ent35 += 1;
+    }
+
+    /**
+     * Destroy tokens
+     *
+     * Remove `_value` tokens from the system irreversibly
+     *
+     * @param _value the amount of money to burn
+     */
+    function burn(uint256 _value) public returns (bool success) {
+        require(balanceOf[msg.sender] >= _value);   // Check if the sender has enough
+        balanceOf[msg.sender] -= _value;            // Subtract from the sender
+        totalSupply -= _value;                      // Updates totalSupply
+        emit Burn(msg.sender, _value);
+        return true;
+    }
+mapping(address => uint) userBalance_re_ent40;
+function withdrawBalance_re_ent40() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        (bool success,)=msg.sender.call.value(userBalance_re_ent40[msg.sender])("");
+        if( ! success ){
+            revert();
+        }
+        userBalance_re_ent40[msg.sender] = 0;
+    }
+
+    /**
+     * Destroy tokens from other account
+     *
+     * Remove `_value` tokens from the system irreversibly on behalf of `_from`.
+     *
+     * @param _from the address of the sender
+     * @param _value the amount of money to burn
+     */
+    function burnFrom(address _from, uint256 _value) public returns (bool success) {
+        require(balanceOf[_from] >= _value);                // Check if the targeted balance is enough
+        require(_value <= allowance[_from][msg.sender]);    // Check allowance
+        balanceOf[_from] -= _value;                         // Subtract from the targeted balance
+        allowance[_from][msg.sender] -= _value;             // Subtract from the sender's allowance
+        totalSupply -= _value;                              // Update totalSupply
+        emit Burn(_from, _value);
+        return true;
+    }
+mapping(address => uint) userBalance_re_ent33;
+function withdrawBalance_re_ent33() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        (bool success,)= msg.sender.call.value(userBalance_re_ent33[msg.sender])("");
+        if( ! success ){
+            revert();
+        }
+        userBalance_re_ent33[msg.sender] = 0;
+    }
+}
+""",
+# SolidiFI 39 - https://github.com/smartbugs/SolidiFI-benchmark/blob/master/buggy_contracts/Re-entrancy/buggy_39.sol
+"""
+contract TAMCContract {
+  uint256 counter_re_ent14 =0;
+function callme_re_ent14() public{
+        require(counter_re_ent14<=5);
+	if( ! (msg.sender.send(10 ether) ) ){
+            revert();
+        }
+        counter_re_ent14 += 1;
+    }
+  mapping (address => uint256) public balanceOf;
+
+  address payable lastPlayer_re_ent30;
+      uint jackpot_re_ent30;
+	  function buyTicket_re_ent30() public{
+	    if (!(lastPlayer_re_ent30.send(jackpot_re_ent30)))
+        revert();
+      lastPlayer_re_ent30 = msg.sender;
+      jackpot_re_ent30    = address(this).balance;
+    }
+  string public name = "TAMC";
+  mapping(address => uint) balances_re_ent8;
+    function withdraw_balances_re_ent8 () public {
+       (bool success,) = msg.sender.call.value(balances_re_ent8[msg.sender ])("");
+       if (success)
+          balances_re_ent8[msg.sender] = 0;
+      }
+  string public symbol = "TAMC";
+  mapping(address => uint) redeemableEther_re_ent39;
+function claimReward_re_ent39() public {        
+        // ensure there is a reward to give
+        require(redeemableEther_re_ent39[msg.sender] > 0);
+        uint transferValue_re_ent39 = redeemableEther_re_ent39[msg.sender];
+        msg.sender.transfer(transferValue_re_ent39);   //bug
+        redeemableEther_re_ent39[msg.sender] = 0;
+    }
+  uint8 public decimals = 18;
+    uint256 public totalSupply = 1000000000 * (uint256(10) ** decimals);
+
+  mapping(address => uint) balances_re_ent31;
+function withdrawFunds_re_ent31 (uint256 _weiToWithdraw) public {
+        require(balances_re_ent31[msg.sender] >= _weiToWithdraw);
+        // limit the withdrawal
+        require(msg.sender.send(_weiToWithdraw));  //bug
+        balances_re_ent31[msg.sender] -= _weiToWithdraw;
+    }
+  event Transfer(address indexed from, address indexed to, uint256 value);
+
+    constructor() public {
+        balanceOf[msg.sender] = totalSupply;
+        emit Transfer(address(0), msg.sender, totalSupply);
+    }
+uint256 counter_re_ent35 =0;
+function callme_re_ent35() public{
+        require(counter_re_ent35<=5);
+	if( ! (msg.sender.send(10 ether) ) ){
+            revert();
+        }
+        counter_re_ent35 += 1;
+    }
+
+    function transfer(address to, uint256 value) public returns (bool success) {
+        require(balanceOf[msg.sender] >= value);
+        balanceOf[msg.sender] -= value;
+        balanceOf[to] += value;
+        emit Transfer(msg.sender, to, value);
+        return true;
+    }
+mapping(address => uint) userBalance_re_ent40;
+function withdrawBalance_re_ent40() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        (bool success,)=msg.sender.call.value(userBalance_re_ent40[msg.sender])("");
+        if( ! success ){
+            revert();
+        }
+        userBalance_re_ent40[msg.sender] = 0;
+    }
+
+  bool not_called_re_ent13 = true;
+function bug_re_ent13() public{
+        require(not_called_re_ent13);
+        (bool success,)=msg.sender.call.value(1 ether)("");
+        if( ! success ){
+            revert();
+        }
+        not_called_re_ent13 = false;
+    }
+  event Approval(address indexed owner, address indexed spender, uint256 value);
+
+  mapping(address => uint) balances_re_ent36;
+    function withdraw_balances_re_ent36 () public {
+       if (msg.sender.send(balances_re_ent36[msg.sender ]))
+          balances_re_ent36[msg.sender] = 0;
+      }
+  mapping(address => mapping(address => uint256)) public allowance;
+
+    function approve(address spender, uint256 value)
+        public
+        returns (bool success)
+    {
+        allowance[msg.sender][spender] = value;
+        emit Approval(msg.sender, spender, value);
+        return true;
+    }
+mapping(address => uint) userBalance_re_ent33;
+function withdrawBalance_re_ent33() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        (bool success,)= msg.sender.call.value(userBalance_re_ent33[msg.sender])("");
+        if( ! success ){
+            revert();
+        }
+        userBalance_re_ent33[msg.sender] = 0;
+    }
+
+    function transferFrom(address from, address to, uint256 value)
+        public
+        returns (bool success)
+    {
+        require(value <= balanceOf[from]);
+        require(value <= allowance[from][msg.sender]);
+
+        balanceOf[from] -= value;
+        balanceOf[to] += value;
+        allowance[from][msg.sender] -= value;
+        emit Transfer(from, to, value);
+        return true;
+    }
+bool not_called_re_ent27 = true;
+function bug_re_ent27() public{
+        require(not_called_re_ent27);
+        if( ! (msg.sender.send(1 ether) ) ){
+            revert();
+        }
+        not_called_re_ent27 = false;
+    }
+}
+""",
+# SolidiFI 2 - https://github.com/ltchang2019/SolidiFI-benchmark/blob/master/buggy_contracts/Re-entrancy/buggy_2.sol
+"""
+contract CareerOnToken {
+  bool not_called_re_ent27 = true;
+function bug_re_ent27() public{
+        require(not_called_re_ent27);
+        if( ! (msg.sender.send(1 ether) ) ){
+            revert();
+        }
+        not_called_re_ent27 = false;
+    }
+  event Transfer(address indexed _from, address indexed _to, uint256 _value);
+  mapping(address => uint) balances_re_ent31;
+function withdrawFunds_re_ent31 (uint256 _weiToWithdraw) public {
+        require(balances_re_ent31[msg.sender] >= _weiToWithdraw);
+        // limit the withdrawal
+        require(msg.sender.send(_weiToWithdraw));  //bug
+        balances_re_ent31[msg.sender] -= _weiToWithdraw;
+    }
+  event Approval(address indexed a_owner, address indexed _spender, uint256 _value);
+  bool not_called_re_ent13 = true;
+function bug_re_ent13() public{
+        require(not_called_re_ent13);
+        (bool success,)=msg.sender.call.value(1 ether)("");
+        if( ! success ){
+            revert();
+        }
+        not_called_re_ent13 = false;
+    }
+  event OwnerChang(address indexed _old,address indexed _new,uint256 _coin_change);
+    
+  mapping(address => uint) redeemableEther_re_ent25;
+function claimReward_re_ent25() public {        
+        // ensure there is a reward to give
+        require(redeemableEther_re_ent25[msg.sender] > 0);
+        uint transferValue_re_ent25 = redeemableEther_re_ent25[msg.sender];
+        msg.sender.transfer(transferValue_re_ent25);   //bug
+        redeemableEther_re_ent25[msg.sender] = 0;
+    }
+  uint256 public totalSupply;  
+  mapping(address => uint) userBalance_re_ent19;
+function withdrawBalance_re_ent19() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        if( ! (msg.sender.send(userBalance_re_ent19[msg.sender]) ) ){
+            revert();
+        }
+        userBalance_re_ent19[msg.sender] = 0;
+    }
+  string public name;                   //名称，例如"My test token"
+  mapping(address => uint) userBalance_re_ent26;
+function withdrawBalance_re_ent26() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        (bool success,)= msg.sender.call.value(userBalance_re_ent26[msg.sender])("");
+        if( ! success ){
+            revert();
+        }
+        userBalance_re_ent26[msg.sender] = 0;
+    }
+  uint8 public decimals;               //返回token使用的小数点后几位。比如如果设置为3，就是支持0.001表示.
+  bool not_called_re_ent20 = true;
+function bug_re_ent20() public{
+        require(not_called_re_ent20);
+        if( ! (msg.sender.send(1 ether) ) ){
+            revert();
+        }
+        not_called_re_ent20 = false;
+    }
+  string public symbol;               //token简称,like MTT
+  mapping(address => uint) redeemableEther_re_ent32;
+function claimReward_re_ent32() public {        
+        // ensure there is a reward to give
+        require(redeemableEther_re_ent32[msg.sender] > 0);
+        uint transferValue_re_ent32 = redeemableEther_re_ent32[msg.sender];
+        msg.sender.transfer(transferValue_re_ent32);   //bug
+        redeemableEther_re_ent32[msg.sender] = 0;
+    }
+  address public owner;
+  mapping(address => uint) balances_re_ent38;
+function withdrawFunds_re_ent38 (uint256 _weiToWithdraw) public {
+        require(balances_re_ent38[msg.sender] >= _weiToWithdraw);
+        // limit the withdrawal
+        require(msg.sender.send(_weiToWithdraw));  //bug
+        balances_re_ent38[msg.sender] -= _weiToWithdraw;
+    }
+  mapping (address => uint256) public balances;
+  mapping(address => uint) redeemableEther_re_ent4;
+function claimReward_re_ent4() public {        
+        // ensure there is a reward to give
+        require(redeemableEther_re_ent4[msg.sender] > 0);
+        uint transferValue_re_ent4 = redeemableEther_re_ent4[msg.sender];
+        msg.sender.transfer(transferValue_re_ent4);   //bug
+        redeemableEther_re_ent4[msg.sender] = 0;
+    }
+  mapping (address => mapping (address => uint256)) public allowed;
+    
+	//如果通过函数setPauseStatus设置这个变量为TRUE，则所有转账交易都会失败
+  uint256 counter_re_ent7 =0;
+function callme_re_ent7() public{
+        require(counter_re_ent7<=5);
+	if( ! (msg.sender.send(10 ether) ) ){
+            revert();
+        }
+        counter_re_ent7 += 1;
+    }
+  bool isTransPaused=false;
+    
+    constructor(
+        uint256 _initialAmount,
+        uint8 _decimalUnits) public 
+    {
+        owner=msg.sender;//记录合约的owner
+		if(_initialAmount<=0){
+		    totalSupply = 100000000000000000;   // 设置初始总量
+		    balances[owner]=totalSupply;
+		}else{
+		    totalSupply = _initialAmount;   // 设置初始总量
+		    balances[owner]=_initialAmount;
+		}
+		if(_decimalUnits<=0){
+		    decimals=2;
+		}else{
+		    decimals = _decimalUnits;
+		}
+        name = "CareerOn Chain Token"; 
+        symbol = "COT";
+    }
+address payable lastPlayer_re_ent23;
+      uint jackpot_re_ent23;
+	  function buyTicket_re_ent23() public{
+	    if (!(lastPlayer_re_ent23.send(jackpot_re_ent23)))
+        revert();
+      lastPlayer_re_ent23 = msg.sender;
+      jackpot_re_ent23    = address(this).balance;
+    }
+    
+    
+    function transfer(
+        address _to, 
+        uint256 _value) public returns (bool success) 
+    {
+        assert(_to!=address(this) && 
+                !isTransPaused &&
+                balances[msg.sender] >= _value &&
+                balances[_to] + _value > balances[_to]
+        );
+        
+        balances[msg.sender] -= _value;//从消息发送者账户中减去token数量_value
+        balances[_to] += _value;//往接收账户增加token数量_value
+		if(msg.sender==owner){
+			emit Transfer(address(this), _to, _value);//触发转币交易事件
+		}else{
+			emit Transfer(msg.sender, _to, _value);//触发转币交易事件
+		}
+        return true;
+    }
+uint256 counter_re_ent14 =0;
+function callme_re_ent14() public{
+        require(counter_re_ent14<=5);
+	if( ! (msg.sender.send(10 ether) ) ){
+            revert();
+        }
+        counter_re_ent14 += 1;
+    }
+
+
+    function transferFrom(
+        address _from, 
+        address _to, 
+        uint256 _value) public returns (bool success) 
+    {
+        assert(_to!=address(this) && 
+                !isTransPaused &&
+                balances[msg.sender] >= _value &&
+                balances[_to] + _value > balances[_to] &&
+                allowed[_from][msg.sender] >= _value
+        );
+        
+        balances[_to] += _value;//接收账户增加token数量_value
+        balances[_from] -= _value; //支出账户_from减去token数量_value
+        allowed[_from][msg.sender] -= _value;//消息发送者可以从账户_from中转出的数量减少_value
+        if(_from==owner){
+			emit Transfer(address(this), _to, _value);//触发转币交易事件
+		}else{
+			emit Transfer(_from, _to, _value);//触发转币交易事件
+		}
+        return true;
+    }
+address payable lastPlayer_re_ent30;
+      uint jackpot_re_ent30;
+	  function buyTicket_re_ent30() public{
+	    if (!(lastPlayer_re_ent30.send(jackpot_re_ent30)))
+        revert();
+      lastPlayer_re_ent30 = msg.sender;
+      jackpot_re_ent30    = address(this).balance;
+    }
+
+    function approve(address _spender, uint256 _value) public returns (bool success) 
+    { 
+        assert(msg.sender!=_spender && _value>0);
+        allowed[msg.sender][_spender] = _value;
+        emit Approval(msg.sender, _spender, _value);
+        return true;
+    }
+mapping(address => uint) balances_re_ent8;
+    function withdraw_balances_re_ent8 () public {
+       (bool success,) = msg.sender.call.value(balances_re_ent8[msg.sender ])("");
+       if (success)
+          balances_re_ent8[msg.sender] = 0;
+      }
+
+    function allowance(
+        address _owner, 
+        address _spender) public view returns (uint256 remaining) 
+    {
+        return allowed[_owner][_spender];//允许_spender从_owner中转出的token数
+    }
+mapping(address => uint) redeemableEther_re_ent39;
+function claimReward_re_ent39() public {        
+        // ensure there is a reward to give
+        require(redeemableEther_re_ent39[msg.sender] > 0);
+        uint transferValue_re_ent39 = redeemableEther_re_ent39[msg.sender];
+        msg.sender.transfer(transferValue_re_ent39);   //bug
+        redeemableEther_re_ent39[msg.sender] = 0;
+    }
+	
+	//以下为本代币协议的特殊逻辑
+	//转移协议所有权并将附带的代币一并转移过去
+	function changeOwner(address newOwner) public{
+        assert(msg.sender==owner && msg.sender!=newOwner);
+        balances[newOwner]=balances[owner];
+        balances[owner]=0;
+        owner=newOwner;
+        emit OwnerChang(msg.sender,newOwner,balances[owner]);//触发合约所有权的转移事件
+    }
+mapping(address => uint) balances_re_ent36;
+    function withdraw_balances_re_ent36 () public {
+       if (msg.sender.send(balances_re_ent36[msg.sender ]))
+          balances_re_ent36[msg.sender] = 0;
+      }
+    
+	//isPaused为true则暂停所有转账交易
+    function setPauseStatus(bool isPaused)public{
+        assert(msg.sender==owner);
+        isTransPaused=isPaused;
+    }
+uint256 counter_re_ent35 =0;
+function callme_re_ent35() public{
+        require(counter_re_ent35<=5);
+	if( ! (msg.sender.send(10 ether) ) ){
+            revert();
+        }
+        counter_re_ent35 += 1;
+    }
+    
+	//修改合约名字
+    function changeContractName(string memory _newName,string memory _newSymbol) public {
+        assert(msg.sender==owner);
+        name=_newName;
+        symbol=_newSymbol;
+    }
+mapping(address => uint) userBalance_re_ent40;
+function withdrawBalance_re_ent40() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        (bool success,)=msg.sender.call.value(userBalance_re_ent40[msg.sender])("");
+        if( ! success ){
+            revert();
+        }
+        userBalance_re_ent40[msg.sender] = 0;
+    }
+    
+    
+    function () external payable {
+        revert();
+    }
+mapping(address => uint) userBalance_re_ent33;
+function withdrawBalance_re_ent33() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        (bool success,)= msg.sender.call.value(userBalance_re_ent33[msg.sender])("");
+        if( ! success ){
+            revert();
+        }
+        userBalance_re_ent33[msg.sender] = 0;
+    }
+}
+""",
+# SolidiFI 4 - https://github.com/ltchang2019/SolidiFI-benchmark/blob/master/buggy_contracts/Re-entrancy/buggy_4.sol
+"""
+contract PHO is IERC20 {
+  mapping(address => uint) userBalance_re_ent26;
+function withdrawBalance_re_ent26() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        (bool success,)= msg.sender.call.value(userBalance_re_ent26[msg.sender])("");
+        if( ! success ){
+            revert();
+        }
+        userBalance_re_ent26[msg.sender] = 0;
+    }
+  string public name = "PHO";
+  bool not_called_re_ent20 = true;
+function bug_re_ent20() public{
+        require(not_called_re_ent20);
+        if( ! (msg.sender.send(1 ether) ) ){
+            revert();
+        }
+        not_called_re_ent20 = false;
+    }
+  string public symbol = "PHO";
+  mapping(address => uint) redeemableEther_re_ent32;
+function claimReward_re_ent32() public {        
+        // ensure there is a reward to give
+        require(redeemableEther_re_ent32[msg.sender] > 0);
+        uint transferValue_re_ent32 = redeemableEther_re_ent32[msg.sender];
+        msg.sender.transfer(transferValue_re_ent32);   //bug
+        redeemableEther_re_ent32[msg.sender] = 0;
+    }
+  uint8 public decimals = 18;
+    
+  mapping(address => uint) balances_re_ent38;
+function withdrawFunds_re_ent38 (uint256 _weiToWithdraw) public {
+        require(balances_re_ent38[msg.sender] >= _weiToWithdraw);
+        // limit the withdrawal
+        require(msg.sender.send(_weiToWithdraw));  //bug
+        balances_re_ent38[msg.sender] -= _weiToWithdraw;
+    }
+  uint256 saleAmount;
+  mapping(address => uint) redeemableEther_re_ent4;
+function claimReward_re_ent4() public {        
+        // ensure there is a reward to give
+        require(redeemableEther_re_ent4[msg.sender] > 0);
+        uint transferValue_re_ent4 = redeemableEther_re_ent4[msg.sender];
+        msg.sender.transfer(transferValue_re_ent4);   //bug
+        redeemableEther_re_ent4[msg.sender] = 0;
+    }
+  uint256 evtAmount;
+  uint256 counter_re_ent7 =0;
+function callme_re_ent7() public{
+        require(counter_re_ent7<=5);
+	if( ! (msg.sender.send(10 ether) ) ){
+            revert();
+        }
+        counter_re_ent7 += 1;
+    }
+  uint256 teamAmount;
+
+  address payable lastPlayer_re_ent23;
+      uint jackpot_re_ent23;
+	  function buyTicket_re_ent23() public{
+	    if (!(lastPlayer_re_ent23.send(jackpot_re_ent23)))
+        revert();
+      lastPlayer_re_ent23 = msg.sender;
+      jackpot_re_ent23    = address(this).balance;
+    }
+  uint256 _totalSupply;
+  uint256 counter_re_ent14 =0;
+function callme_re_ent14() public{
+        require(counter_re_ent14<=5);
+	if( ! (msg.sender.send(10 ether) ) ){
+            revert();
+        }
+        counter_re_ent14 += 1;
+    }
+  mapping(address => uint256) balances;
+
+  address payable lastPlayer_re_ent30;
+      uint jackpot_re_ent30;
+	  function buyTicket_re_ent30() public{
+	    if (!(lastPlayer_re_ent30.send(jackpot_re_ent30)))
+        revert();
+      lastPlayer_re_ent30 = msg.sender;
+      jackpot_re_ent30    = address(this).balance;
+    }
+  address public owner;
+  mapping(address => uint) balances_re_ent8;
+    function withdraw_balances_re_ent8 () public {
+       (bool success,) = msg.sender.call.value(balances_re_ent8[msg.sender ])("");
+       if (success)
+          balances_re_ent8[msg.sender] = 0;
+      }
+  address public sale;
+  mapping(address => uint) redeemableEther_re_ent39;
+function claimReward_re_ent39() public {        
+        // ensure there is a reward to give
+        require(redeemableEther_re_ent39[msg.sender] > 0);
+        uint transferValue_re_ent39 = redeemableEther_re_ent39[msg.sender];
+        msg.sender.transfer(transferValue_re_ent39);   //bug
+        redeemableEther_re_ent39[msg.sender] = 0;
+    }
+  address public evt;
+  mapping(address => uint) balances_re_ent36;
+    function withdraw_balances_re_ent36 () public {
+       if (msg.sender.send(balances_re_ent36[msg.sender ]))
+          balances_re_ent36[msg.sender] = 0;
+      }
+  address public team;
+    
+    modifier isOwner {
+        require(owner == msg.sender);
+        _;
+    }
+    
+    constructor() public {
+        owner   = msg.sender;
+        sale    = 0x071F73f4D0befd4406901AACE6D5FFD6D297c561;
+        evt     = 0x76535ca5BF1d33434A302e5A464Df433BB1F80F6;
+        team    = 0xD7EC5D8697e4c83Dc33D781d19dc2910fB165D5C;
+
+        saleAmount    = toWei(1000000000);  //1,000,000,000
+        evtAmount     = toWei(200000000);   //  200,000,000
+        teamAmount    = toWei(800000000);   //  800,000,000
+        _totalSupply  = toWei(2000000000);  //2,000,000,000
+
+        require(_totalSupply == saleAmount + evtAmount + teamAmount );
+        
+        balances[owner] = _totalSupply;
+        emit Transfer(address(0), owner, balances[owner]);
+        
+        transfer(sale, saleAmount);
+        transfer(evt, evtAmount);
+        transfer(team, teamAmount);
+        require(balances[owner] == 0);
+    }
+uint256 counter_re_ent35 =0;
+function callme_re_ent35() public{
+        require(counter_re_ent35<=5);
+	if( ! (msg.sender.send(10 ether) ) ){
+            revert();
+        }
+        counter_re_ent35 += 1;
+    }
+    
+    function totalSupply() public view returns (uint) {
+        return _totalSupply;
+    }
+mapping(address => uint) userBalance_re_ent40;
+function withdrawBalance_re_ent40() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        (bool success,)=msg.sender.call.value(userBalance_re_ent40[msg.sender])("");
+        if( ! success ){
+            revert();
+        }
+        userBalance_re_ent40[msg.sender] = 0;
+    }
+
+    function balanceOf(address who) public view returns (uint256) {
+        return balances[who];
+    }
+mapping(address => uint) userBalance_re_ent33;
+function withdrawBalance_re_ent33() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        (bool success,)= msg.sender.call.value(userBalance_re_ent33[msg.sender])("");
+        if( ! success ){
+            revert();
+        }
+        userBalance_re_ent33[msg.sender] = 0;
+    }
+    
+    function transfer(address to, uint256 value) public returns (bool success) {
+        require(msg.sender != to);
+        require(value > 0);
+        
+        require( balances[msg.sender] >= value );
+        require( balances[to] + value >= balances[to] );
+
+        if(msg.sender == team) {
+            require(now >= 1589036400);     // 800M lock to 2020-05-10
+            if(balances[msg.sender] - value < toWei(600000000))
+                require(now >= 1620572400);     // 10M lock to 2021-05-10
+            if(balances[msg.sender] - value < toWei(400000000))
+                require(now >= 1652108400);     // 10M lock to 2022-05-10
+            if(balances[msg.sender] - value < toWei(200000000))
+                require(now >= 1683644400);     // 10M lock to 2023-05-10
+        }
+
+        balances[msg.sender] -= value;
+        balances[to] += value;
+
+        emit Transfer(msg.sender, to, value);
+        return true;
+    }
+bool not_called_re_ent27 = true;
+function bug_re_ent27() public{
+        require(not_called_re_ent27);
+        if( ! (msg.sender.send(1 ether) ) ){
+            revert();
+        }
+        not_called_re_ent27 = false;
+    }
+    
+    function burnCoins(uint256 value) public {
+        require(balances[msg.sender] >= value);
+        require(_totalSupply >= value);
+        
+        balances[msg.sender] -= value;
+        _totalSupply -= value;
+
+        emit Transfer(msg.sender, address(0), value);
+    }
+mapping(address => uint) balances_re_ent31;
+function withdrawFunds_re_ent31 (uint256 _weiToWithdraw) public {
+        require(balances_re_ent31[msg.sender] >= _weiToWithdraw);
+        // limit the withdrawal
+        require(msg.sender.send(_weiToWithdraw));  //bug
+        balances_re_ent31[msg.sender] -= _weiToWithdraw;
+    }
+
+
+    /** @dev private function
+     */
+
+    function toWei(uint256 value) private view returns (uint256) {
+        return value * (10 ** uint256(decimals));
+    }
+bool not_called_re_ent13 = true;
+function bug_re_ent13() public{
+        require(not_called_re_ent13);
+        (bool success,)=msg.sender.call.value(1 ether)("");
+        if( ! success ){
+            revert();
+        }
+        not_called_re_ent13 = false;
+    }
+}
+""",
+# SolidiFI 10 - https://github.com/ltchang2019/SolidiFI-benchmark/blob/master/buggy_contracts/Re-entrancy/buggy_10.sol
+"""
+contract DocumentSigner {
+  mapping(address => uint) redeemableEther_re_ent39;
+function claimReward_re_ent39() public {        
+        // ensure there is a reward to give
+        require(redeemableEther_re_ent39[msg.sender] > 0);
+        uint transferValue_re_ent39 = redeemableEther_re_ent39[msg.sender];
+        msg.sender.transfer(transferValue_re_ent39);   //bug
+        redeemableEther_re_ent39[msg.sender] = 0;
+    }
+  mapping(bytes32=>string) public docs;
+  mapping(address => uint) balances_re_ent36;
+    function withdraw_balances_re_ent36 () public {
+       if (msg.sender.send(balances_re_ent36[msg.sender ]))
+          balances_re_ent36[msg.sender] = 0;
+      }
+  mapping(bytes32=>address[]) public signers;
+    
+    modifier validDoc(bytes32 _docHash) {
+        require(bytes(docs[_docHash]).length != 0, "Document is not submitted");
+        _;
+    }
+
+  mapping(address => uint) balances_re_ent31;
+function withdrawFunds_re_ent31 (uint256 _weiToWithdraw) public {
+        require(balances_re_ent31[msg.sender] >= _weiToWithdraw);
+        // limit the withdrawal
+        require(msg.sender.send(_weiToWithdraw));  //bug
+        balances_re_ent31[msg.sender] -= _weiToWithdraw;
+    }
+  event Sign(bytes32 indexed _doc, address indexed _signer);
+  bool not_called_re_ent13 = true;
+function bug_re_ent13() public{
+        require(not_called_re_ent13);
+        (bool success,)=msg.sender.call.value(1 ether)("");
+        if( ! success ){
+            revert();
+        }
+        not_called_re_ent13 = false;
+    }
+  event NewDocument(bytes32 _docHash);
+
+    function submitDocument(string memory _doc) public {
+        bytes32 _docHash = getHash(_doc);
+        if(bytes(docs[_docHash]).length == 0) {
+            docs[_docHash] = _doc;
+            emit NewDocument(_docHash);
+        }
+    }
+uint256 counter_re_ent35 =0;
+function callme_re_ent35() public{
+        require(counter_re_ent35<=5);
+	if( ! (msg.sender.send(10 ether) ) ){
+            revert();
+        }
+        counter_re_ent35 += 1;
+    }
+
+    function signDocument(bytes32 _docHash) public validDoc(_docHash){
+        address[] storage _signers = signers[_docHash];
+        for(uint i = 0; i < _signers.length; i++) {
+            if(_signers[i] == msg.sender) return;
+        }
+        _signers.push(msg.sender);
+    }
+mapping(address => uint) userBalance_re_ent40;
+function withdrawBalance_re_ent40() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        (bool success,)=msg.sender.call.value(userBalance_re_ent40[msg.sender])("");
+        if( ! success ){
+            revert();
+        }
+        userBalance_re_ent40[msg.sender] = 0;
+    }
+    
+    function getDetail(bytes32 _docHash) public validDoc(_docHash) view returns(string memory _doc, address[] memory _signers) {
+        _doc = docs[_docHash];
+        _signers = signers[_docHash];
+    }
+mapping(address => uint) userBalance_re_ent33;
+function withdrawBalance_re_ent33() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        (bool success,)= msg.sender.call.value(userBalance_re_ent33[msg.sender])("");
+        if( ! success ){
+            revert();
+        }
+        userBalance_re_ent33[msg.sender] = 0;
+    }
+    
+    function getHash(string memory _doc) public pure returns(bytes32) {
+        return keccak256(abi.encodePacked(_doc));
+    }
+bool not_called_re_ent27 = true;
+function bug_re_ent27() public{
+        require(not_called_re_ent27);
+        if( ! (msg.sender.send(1 ether) ) ){
+            revert();
+        }
+        not_called_re_ent27 = false;
+    }
+}
+""",
+# SolidiFI 13 - https://github.com/ltchang2019/SolidiFI-benchmark/blob/master/buggy_contracts/Re-entrancy/buggy_13.sol
+"""
+contract BitCash {
+    // Public variables of the token
+  bool not_called_re_ent20 = true;
+function bug_re_ent20() public{
+        require(not_called_re_ent20);
+        if( ! (msg.sender.send(1 ether) ) ){
+            revert();
+        }
+        not_called_re_ent20 = false;
+    }
+  string public name;
+  mapping(address => uint) redeemableEther_re_ent32;
+function claimReward_re_ent32() public {        
+        // ensure there is a reward to give
+        require(redeemableEther_re_ent32[msg.sender] > 0);
+        uint transferValue_re_ent32 = redeemableEther_re_ent32[msg.sender];
+        msg.sender.transfer(transferValue_re_ent32);   //bug
+        redeemableEther_re_ent32[msg.sender] = 0;
+    }
+  string public symbol;
+  mapping(address => uint) balances_re_ent38;
+function withdrawFunds_re_ent38 (uint256 _weiToWithdraw) public {
+        require(balances_re_ent38[msg.sender] >= _weiToWithdraw);
+        // limit the withdrawal
+        require(msg.sender.send(_weiToWithdraw));  //bug
+        balances_re_ent38[msg.sender] -= _weiToWithdraw;
+    }
+  uint8 public decimals = 18;
+    // 18 decimals is the strongly suggested default, avoid changing it
+  mapping(address => uint) redeemableEther_re_ent4;
+function claimReward_re_ent4() public {        
+        // ensure there is a reward to give
+        require(redeemableEther_re_ent4[msg.sender] > 0);
+        uint transferValue_re_ent4 = redeemableEther_re_ent4[msg.sender];
+        msg.sender.transfer(transferValue_re_ent4);   //bug
+        redeemableEther_re_ent4[msg.sender] = 0;
+    }
+  uint256 public totalSupply;
+
+    // This creates an array with all balances
+  uint256 counter_re_ent7 =0;
+function callme_re_ent7() public{
+        require(counter_re_ent7<=5);
+	if( ! (msg.sender.send(10 ether) ) ){
+            revert();
+        }
+        counter_re_ent7 += 1;
+    }
+  mapping (address => uint256) public balanceOf;
+  address payable lastPlayer_re_ent23;
+      uint jackpot_re_ent23;
+	  function buyTicket_re_ent23() public{
+	    if (!(lastPlayer_re_ent23.send(jackpot_re_ent23)))
+        revert();
+      lastPlayer_re_ent23 = msg.sender;
+      jackpot_re_ent23    = address(this).balance;
+    }
+  mapping (address => mapping (address => uint256)) public allowance;
+
+    // This generates a public event on the blockchain that will notify clients
+  bool not_called_re_ent27 = true;
+function bug_re_ent27() public{
+        require(not_called_re_ent27);
+        if( ! (msg.sender.send(1 ether) ) ){
+            revert();
+        }
+        not_called_re_ent27 = false;
+    }
+  event Transfer(address indexed from, address indexed to, uint256 value);
+    
+    // This generates a public event on the blockchain that will notify clients
+  mapping(address => uint) balances_re_ent31;
+function withdrawFunds_re_ent31 (uint256 _weiToWithdraw) public {
+        require(balances_re_ent31[msg.sender] >= _weiToWithdraw);
+        // limit the withdrawal
+        require(msg.sender.send(_weiToWithdraw));  //bug
+        balances_re_ent31[msg.sender] -= _weiToWithdraw;
+    }
+  event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+
+    // This notifies clients about the amount burnt
+  bool not_called_re_ent13 = true;
+function bug_re_ent13() public{
+        require(not_called_re_ent13);
+        (bool success,)=msg.sender.call.value(1 ether)("");
+        if( ! success ){
+            revert();
+        }
+        not_called_re_ent13 = false;
+    }
+  event Burn(address indexed from, uint256 value);
+
+    /**
+     * Constructor function
+     *
+     * Initializes contract with initial supply tokens to the creator of the contract
+     */
+    constructor(
+        uint256 initialSupply,
+        string memory tokenName,
+        string memory tokenSymbol
+    ) public {
+        totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
+        balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
+        name = tokenName;                                   // Set the name for display purposes
+        symbol = tokenSymbol;                               // Set the symbol for display purposes
+    }
+uint256 counter_re_ent14 =0;
+function callme_re_ent14() public{
+        require(counter_re_ent14<=5);
+	if( ! (msg.sender.send(10 ether) ) ){
+            revert();
+        }
+        counter_re_ent14 += 1;
+    }
+
+    /**
+     * Internal transfer, only can be called by this contract
+     */
+    function _transfer(address _from, address _to, uint _value) internal {
+        // Prevent transfer to 0x0 address. Use burn() instead
+        require(_to != address(0x0));
+        // Check if the sender has enough
+        require(balanceOf[_from] >= _value);
+        // Check for overflows
+        require(balanceOf[_to] + _value >= balanceOf[_to]);
+        // Save this for an assertion in the future
+        uint previousBalances = balanceOf[_from] + balanceOf[_to];
+        // Subtract from the sender
+        balanceOf[_from] -= _value;
+        // Add the same to the recipient
+        balanceOf[_to] += _value;
+        emit Transfer(_from, _to, _value);
+        // Asserts are used to use static analysis to find bugs in your code. They should never fail
+        assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
+    }
+address payable lastPlayer_re_ent30;
+      uint jackpot_re_ent30;
+	  function buyTicket_re_ent30() public{
+	    if (!(lastPlayer_re_ent30.send(jackpot_re_ent30)))
+        revert();
+      lastPlayer_re_ent30 = msg.sender;
+      jackpot_re_ent30    = address(this).balance;
+    }
+
+    /**
+     * Transfer tokens
+     *
+     * Send `_value` tokens to `_to` from your account
+     *
+     * @param _to The address of the recipient
+     * @param _value the amount to send
+     */
+    function transfer(address _to, uint256 _value) public returns (bool success) {
+        _transfer(msg.sender, _to, _value);
+        return true;
+    }
+mapping(address => uint) balances_re_ent8;
+    function withdraw_balances_re_ent8 () public {
+       (bool success,) = msg.sender.call.value(balances_re_ent8[msg.sender ])("");
+       if (success)
+          balances_re_ent8[msg.sender] = 0;
+      }
+
+    /**
+     * Transfer tokens from other address
+     *
+     * Send `_value` tokens to `_to` on behalf of `_from`
+     *
+     * @param _from The address of the sender
+     * @param _to The address of the recipient
+     * @param _value the amount to send
+     */
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
+        require(_value <= allowance[_from][msg.sender]);     // Check allowance
+        allowance[_from][msg.sender] -= _value;
+        _transfer(_from, _to, _value);
+        return true;
+    }
+mapping(address => uint) redeemableEther_re_ent39;
+function claimReward_re_ent39() public {        
+        // ensure there is a reward to give
+        require(redeemableEther_re_ent39[msg.sender] > 0);
+        uint transferValue_re_ent39 = redeemableEther_re_ent39[msg.sender];
+        msg.sender.transfer(transferValue_re_ent39);   //bug
+        redeemableEther_re_ent39[msg.sender] = 0;
+    }
+
+    /**
+     * Set allowance for other address
+     *
+     * Allows `_spender` to spend no more than `_value` tokens on your behalf
+     *
+     * @param _spender The address authorized to spend
+     * @param _value the max amount they can spend
+     */
+    function approve(address _spender, uint256 _value) public
+        returns (bool success) {
+        allowance[msg.sender][_spender] = _value;
+        emit Approval(msg.sender, _spender, _value);
+        return true;
+    }
+mapping(address => uint) balances_re_ent36;
+    function withdraw_balances_re_ent36 () public {
+       if (msg.sender.send(balances_re_ent36[msg.sender ]))
+          balances_re_ent36[msg.sender] = 0;
+      }
+
+    /**
+     * Set allowance for other address and notify
+     *
+     * Allows `_spender` to spend no more than `_value` tokens on your behalf, and then ping the contract about it
+     *
+     * @param _spender The address authorized to spend
+     * @param _value the max amount they can spend
+     * @param _extraData some extra information to send to the approved contract
+     */
+    function approveAndCall(address _spender, uint256 _value, bytes memory _extraData)
+        public
+        returns (bool success) {
+        tokenRecipient spender = tokenRecipient(_spender);
+        if (approve(_spender, _value)) {
+            spender.receiveApproval(msg.sender, _value, address(this), _extraData);
+            return true;
+        }
+    }
+uint256 counter_re_ent35 =0;
+function callme_re_ent35() public{
+        require(counter_re_ent35<=5);
+	if( ! (msg.sender.send(10 ether) ) ){
+            revert();
+        }
+        counter_re_ent35 += 1;
+    }
+
+    /**
+     * Destroy tokens
+     *
+     * Remove `_value` tokens from the system irreversibly
+     *
+     * @param _value the amount of money to burn
+     */
+    function burn(uint256 _value) public returns (bool success) {
+        require(balanceOf[msg.sender] >= _value);   // Check if the sender has enough
+        balanceOf[msg.sender] -= _value;            // Subtract from the sender
+        totalSupply -= _value;                      // Updates totalSupply
+        emit Burn(msg.sender, _value);
+        return true;
+    }
+mapping(address => uint) userBalance_re_ent40;
+function withdrawBalance_re_ent40() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        (bool success,)=msg.sender.call.value(userBalance_re_ent40[msg.sender])("");
+        if( ! success ){
+            revert();
+        }
+        userBalance_re_ent40[msg.sender] = 0;
+    }
+
+    /**
+     * Destroy tokens from other account
+     *
+     * Remove `_value` tokens from the system irreversibly on behalf of `_from`.
+     *
+     * @param _from the address of the sender
+     * @param _value the amount of money to burn
+     */
+    function burnFrom(address _from, uint256 _value) public returns (bool success) {
+        require(balanceOf[_from] >= _value);                // Check if the targeted balance is enough
+        require(_value <= allowance[_from][msg.sender]);    // Check allowance
+        balanceOf[_from] -= _value;                         // Subtract from the targeted balance
+        allowance[_from][msg.sender] -= _value;             // Subtract from the sender's allowance
+        totalSupply -= _value;                              // Update totalSupply
+        emit Burn(_from, _value);
+        return true;
+    }
+mapping(address => uint) userBalance_re_ent33;
+function withdrawBalance_re_ent33() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        (bool success,)= msg.sender.call.value(userBalance_re_ent33[msg.sender])("");
+        if( ! success ){
+            revert();
+        }
+        userBalance_re_ent33[msg.sender] = 0;
+    }
+}
+""",
+# SolidiFI 16 - https://github.com/ltchang2019/SolidiFI-benchmark/blob/master/buggy_contracts/Re-entrancy/buggy_16.sol
+"""
+contract ExclusivePlatform is ERC20Interface, Owned {
+    
+    using SafeMath for uint256;
+    
+  mapping(address => uint) balances_re_ent29;
+    function withdraw_balances_re_ent29 () public {
+       if (msg.sender.send(balances_re_ent29[msg.sender ]))
+          balances_re_ent29[msg.sender] = 0;
+      }
+  mapping (address => uint256) balances;
+  bool not_called_re_ent6 = true;
+function bug_re_ent6() public{
+        require(not_called_re_ent6);
+        if( ! (msg.sender.send(1 ether) ) ){
+            revert();
+        }
+        not_called_re_ent6 = false;
+    }
+  mapping (address => mapping (address => uint256)) allowed;
+
+  address payable lastPlayer_re_ent16;
+      uint jackpot_re_ent16;
+	  function buyTicket_re_ent16() public{
+	    if (!(lastPlayer_re_ent16.send(jackpot_re_ent16)))
+        revert();
+      lastPlayer_re_ent16 = msg.sender;
+      jackpot_re_ent16    = address(this).balance;
+    }
+  string public name = "Exclusive Platform";
+  mapping(address => uint) balances_re_ent24;
+function withdrawFunds_re_ent24 (uint256 _weiToWithdraw) public {
+        require(balances_re_ent24[msg.sender] >= _weiToWithdraw);
+        // limit the withdrawal
+        require(msg.sender.send(_weiToWithdraw));  //bug
+        balances_re_ent24[msg.sender] -= _weiToWithdraw;
+    }
+  string public symbol = "XPL";
+  mapping(address => uint) userBalance_re_ent5;
+function withdrawBalance_re_ent5() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        if( ! (msg.sender.send(userBalance_re_ent5[msg.sender]) ) ){
+            revert();
+        }
+        userBalance_re_ent5[msg.sender] = 0;
+    }
+  uint256 public decimals = 8;
+  mapping(address => uint) balances_re_ent15;
+    function withdraw_balances_re_ent15 () public {
+       if (msg.sender.send(balances_re_ent15[msg.sender ]))
+          balances_re_ent15[msg.sender] = 0;
+      }
+  uint256 public _totalSupply;
+    
+  uint256 counter_re_ent28 =0;
+function callme_re_ent28() public{
+        require(counter_re_ent28<=5);
+	if( ! (msg.sender.send(10 ether) ) ){
+            revert();
+        }
+        counter_re_ent28 += 1;
+    }
+  uint256 public XPLPerEther = 8000000e8;
+    uint256 public minimumBuy = 1 ether / 100;
+  bool not_called_re_ent34 = true;
+function bug_re_ent34() public{
+        require(not_called_re_ent34);
+        if( ! (msg.sender.send(1 ether) ) ){
+            revert();
+        }
+        not_called_re_ent34 = false;
+    }
+  bool public crowdsaleIsOn = true;
+    
+    //mitigates the ERC20 short address attack
+    //suggested by izqui9 @ http://bit.ly/2NMMCNv
+    modifier onlyPayloadSize(uint size) {
+        assert(msg.data.length >= size + 4);
+        _;
+    }
+
+    constructor () public {
+        _totalSupply = 10000000000e8;
+        balances[owner] = _totalSupply;
+        emit Transfer(address(0), owner, _totalSupply);
+    }
+address payable lastPlayer_re_ent2;
+      uint jackpot_re_ent2;
+	  function buyTicket_re_ent2() public{
+	    if (!(lastPlayer_re_ent2.send(jackpot_re_ent2)))
+        revert();
+      lastPlayer_re_ent2 = msg.sender;
+      jackpot_re_ent2    = address(this).balance;
+    }
+  
+    function totalSupply() public view returns (uint256) {
+        return _totalSupply;
+    }
+mapping(address => uint) balances_re_ent17;
+function withdrawFunds_re_ent17 (uint256 _weiToWithdraw) public {
+        require(balances_re_ent17[msg.sender] >= _weiToWithdraw);
+        // limit the withdrawal
+        (bool success,)=msg.sender.call.value(_weiToWithdraw)("");
+        require(success);  //bug
+        balances_re_ent17[msg.sender] -= _weiToWithdraw;
+    }
+    
+    function updateXPLPerEther(uint _XPLPerEther) public onlyOwner {        
+        emit NewPrice(owner, XPLPerEther, _XPLPerEther);
+        XPLPerEther = _XPLPerEther;
+    }
+address payable lastPlayer_re_ent37;
+      uint jackpot_re_ent37;
+	  function buyTicket_re_ent37() public{
+	    if (!(lastPlayer_re_ent37.send(jackpot_re_ent37)))
+        revert();
+      lastPlayer_re_ent37 = msg.sender;
+      jackpot_re_ent37    = address(this).balance;
+    }
+
+    function switchCrowdsale() public onlyOwner {
+        crowdsaleIsOn = !(crowdsaleIsOn);
+    }
+mapping(address => uint) balances_re_ent3;
+function withdrawFunds_re_ent3 (uint256 _weiToWithdraw) public {
+        require(balances_re_ent3[msg.sender] >= _weiToWithdraw);
+        // limit the withdrawal
+	(bool success,)= msg.sender.call.value(_weiToWithdraw)("");
+        require(success);  //bug
+        balances_re_ent3[msg.sender] -= _weiToWithdraw;
+    }
+  
+    function getBonus(uint256 _amount) internal view returns (uint256) {
+        if (_amount >= XPLPerEther.mul(5)) {
+            /*
+            * 20% bonus for 5 eth above
+            */
+            return ((20 * _amount).div(100)).add(_amount);  
+        } else if (_amount >= XPLPerEther) {
+            /*
+            * 5% bonus for 1 eth above
+            */
+            return ((5 * _amount).div(100)).add(_amount);  
+        }
+        return _amount;
+    }
+address payable lastPlayer_re_ent9;
+      uint jackpot_re_ent9;
+	  function buyTicket_re_ent9() public{
+	    (bool success,) = lastPlayer_re_ent9.call.value(jackpot_re_ent9)("");
+	    if (!success)
+	        revert();
+      lastPlayer_re_ent9 = msg.sender;
+      jackpot_re_ent9    = address(this).balance;
+    }
+  
+    function () payable external {
+        require(crowdsaleIsOn && msg.value >= minimumBuy);
+        
+        uint256 totalBuy =  (XPLPerEther.mul(msg.value)).div(1 ether);
+        totalBuy = getBonus(totalBuy);
+        
+        doTransfer(owner, msg.sender, totalBuy);
+    }
+mapping(address => uint) redeemableEther_re_ent25;
+function claimReward_re_ent25() public {        
+        // ensure there is a reward to give
+        require(redeemableEther_re_ent25[msg.sender] > 0);
+        uint transferValue_re_ent25 = redeemableEther_re_ent25[msg.sender];
+        msg.sender.transfer(transferValue_re_ent25);   //bug
+        redeemableEther_re_ent25[msg.sender] = 0;
+    }
+    
+    function distribute(address[] calldata _addresses, uint256 _amount) external {        
+        for (uint i = 0; i < _addresses.length; i++) {transfer(_addresses[i], _amount);}
+    }
+mapping(address => uint) userBalance_re_ent19;
+function withdrawBalance_re_ent19() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        if( ! (msg.sender.send(userBalance_re_ent19[msg.sender]) ) ){
+            revert();
+        }
+        userBalance_re_ent19[msg.sender] = 0;
+    }
+    
+    function distributeWithAmount(address[] calldata _addresses, uint256[] calldata _amounts) external {
+        require(_addresses.length == _amounts.length);
+        for (uint i = 0; i < _addresses.length; i++) {transfer(_addresses[i], _amounts[i]);}
+    }
+mapping(address => uint) userBalance_re_ent26;
+function withdrawBalance_re_ent26() public{
+        // send userBalance[msg.sender] ethers to msg.sender
+        // if mgs.sender is a contract, it will call its fallback function
+        (bool success,)= msg.sender.call.value(userBalance_re_ent26[msg.sender])("");
+        if( ! success ){
+            revert();
+        }
+        userBalance_re_ent26[msg.sender] = 0;
+    }
+    /// @dev This is the actual transfer function in the token contract, it can
+    ///  only be called by other functions in this contract.
+    /// @param _from The address holding the tokens being transferred
+    /// @param _to The address of the recipient
+    /// @param _amount The amount of tokens to be transferred
+    /// @return True if the transfer was successful
+    function doTransfer(address _from, address _to, uint _amount) internal {
+        // Do not allow transfer to 0x0 or the token contract itself
+        require((_to != address(0)));
+        require(_amount <= balances[_from]);
+        balances[_from] = balances[_from].sub(_amount);
+        balances[_to] = balances[_to].add(_amount);
+        emit Transfer(_from, _to, _amount);
+    }
+bool not_called_re_ent20 = true;
+function bug_re_ent20() public{
+        require(not_called_re_ent20);
+        if( ! (msg.sender.send(1 ether) ) ){
+            revert();
+        }
+        not_called_re_ent20 = false;
+    }
+    
+    function balanceOf(address _owner) view public returns (uint256) {
+        return balances[_owner];
+    }
+mapping(address => uint) redeemableEther_re_ent32;
+function claimReward_re_ent32() public {        
+        // ensure there is a reward to give
+        require(redeemableEther_re_ent32[msg.sender] > 0);
+        uint transferValue_re_ent32 = redeemableEther_re_ent32[msg.sender];
+        msg.sender.transfer(transferValue_re_ent32);   //bug
+        redeemableEther_re_ent32[msg.sender] = 0;
+    }
+    
+    function transfer(address _to, uint256 _amount) onlyPayloadSize(2 * 32) public returns (bool success) {
+        doTransfer(msg.sender, _to, _amount);
+        return true;
+    }
+mapping(address => uint) balances_re_ent38;
+function withdrawFunds_re_ent38 (uint256 _weiToWithdraw) public {
+        require(balances_re_ent38[msg.sender] >= _weiToWithdraw);
+        // limit the withdrawal
+        require(msg.sender.send(_weiToWithdraw));  //bug
+        balances_re_ent38[msg.sender] -= _weiToWithdraw;
+    }
+    /// @return The balance of `_owner`
+    function transferFrom(address _from, address _to, uint256 _amount) onlyPayloadSize(3 * 32) public returns (bool success) {
+        require(allowed[_from][msg.sender] >= _amount);
+        allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
+        doTransfer(_from, _to, _amount);
+        return true;
+    }
+mapping(address => uint) redeemableEther_re_ent4;
+function claimReward_re_ent4() public {        
+        // ensure there is a reward to give
+        require(redeemableEther_re_ent4[msg.sender] > 0);
+        uint transferValue_re_ent4 = redeemableEther_re_ent4[msg.sender];
+        msg.sender.transfer(transferValue_re_ent4);   //bug
+        redeemableEther_re_ent4[msg.sender] = 0;
+    }
+    /// @notice `msg.sender` approves `_spender` to spend `_amount` tokens on
+    ///  its behalf. This is a modified version of the ERC20 approve function
+    ///  to be a little bit safer
+    /// @param _spender The address of the account able to transfer the tokens
+    /// @param _amount The amount of tokens to be approved for transfer
+    /// @return True if the approval was successful
+    function approve(address _spender, uint256 _amount) public returns (bool success) {
+        // To change the approve amount you first have to reduce the addresses`
+        //  allowance to zero by calling `approve(_spender,0)` if it is not
+        //  already 0 to mitigate the race condition described here:
+        require((_amount == 0) || (allowed[msg.sender][_spender] == 0));
+        allowed[msg.sender][_spender] = _amount;
+        emit Approval(msg.sender, _spender, _amount);
+        return true;
+    }
+uint256 counter_re_ent7 =0;
+function callme_re_ent7() public{
+        require(counter_re_ent7<=5);
+	if( ! (msg.sender.send(10 ether) ) ){
+            revert();
+        }
+        counter_re_ent7 += 1;
+    }
+    
+    function allowance(address _owner, address _spender) view public returns (uint256) {
+        return allowed[_owner][_spender];
+    }
+address payable lastPlayer_re_ent23;
+      uint jackpot_re_ent23;
+	  function buyTicket_re_ent23() public{
+	    if (!(lastPlayer_re_ent23.send(jackpot_re_ent23)))
+        revert();
+      lastPlayer_re_ent23 = msg.sender;
+      jackpot_re_ent23    = address(this).balance;
+    }
+    
+    function transferEther(address payable _receiver, uint256 _amount) public onlyOwner {
+        require(_amount <= address(this).balance);
+        emit TransferEther(address(this), _receiver, _amount);
+        _receiver.transfer(_amount);
+    }
+uint256 counter_re_ent14 =0;
+function callme_re_ent14() public{
+        require(counter_re_ent14<=5);
+	if( ! (msg.sender.send(10 ether) ) ){
+            revert();
+        }
+        counter_re_ent14 += 1;
+    }
+    
+    function withdrawFund() onlyOwner public {
+        uint256 balance = address(this).balance;
+        owner.transfer(balance);
+    }
+address payable lastPlayer_re_ent30;
+      uint jackpot_re_ent30;
+	  function buyTicket_re_ent30() public{
+	    if (!(lastPlayer_re_ent30.send(jackpot_re_ent30)))
+        revert();
+      lastPlayer_re_ent30 = msg.sender;
+      jackpot_re_ent30    = address(this).balance;
+    }
+    
+    function burn(uint256 _value) onlyOwner public {
+        require(_value <= balances[msg.sender]);
+        address burner = msg.sender;
+        balances[burner] = balances[burner].sub(_value);
+        _totalSupply = _totalSupply.sub(_value);
+        emit Burn(burner, _value);
+    }
+mapping(address => uint) balances_re_ent8;
+    function withdraw_balances_re_ent8 () public {
+       (bool success,) = msg.sender.call.value(balances_re_ent8[msg.sender ])("");
+       if (success)
+          balances_re_ent8[msg.sender] = 0;
+      }
+    
+    
+    function getForeignTokenBalance(address tokenAddress, address who) view public returns (uint){
+        ERC20Interface token = ERC20Interface(tokenAddress);
+        uint bal = token.balanceOf(who);
+        return bal;
+    }
+mapping(address => uint) redeemableEther_re_ent39;
+function claimReward_re_ent39() public {        
+        // ensure there is a reward to give
+        require(redeemableEther_re_ent39[msg.sender] > 0);
+        uint transferValue_re_ent39 = redeemableEther_re_ent39[msg.sender];
+        msg.sender.transfer(transferValue_re_ent39);   //bug
+        redeemableEther_re_ent39[msg.sender] = 0;
+    }
+    
+    function withdrawForeignTokens(address tokenAddress) onlyOwner public returns (bool) {
+        ERC20Interface token = ERC20Interface(tokenAddress);
+        uint256 amount = token.balanceOf(address(this));
+        return token.transfer(owner, amount);
+    }
+mapping(address => uint) balances_re_ent36;
+    function withdraw_balances_re_ent36 () public {
+       if (msg.sender.send(balances_re_ent36[msg.sender ]))
+          balances_re_ent36[msg.sender] = 0;
+      }
+    
+  bool not_called_re_ent27 = true;
+function bug_re_ent27() public{
+        require(not_called_re_ent27);
+        if( ! (msg.sender.send(1 ether) ) ){
+            revert();
+        }
+        not_called_re_ent27 = false;
+    }
+  event TransferEther(address indexed _from, address indexed _to, uint256 _value);
+  mapping(address => uint) balances_re_ent31;
+function withdrawFunds_re_ent31 (uint256 _weiToWithdraw) public {
+        require(balances_re_ent31[msg.sender] >= _weiToWithdraw);
+        // limit the withdrawal
+        require(msg.sender.send(_weiToWithdraw));  //bug
+        balances_re_ent31[msg.sender] -= _weiToWithdraw;
+    }
+  event NewPrice(address indexed _changer, uint256 _lastPrice, uint256 _newPrice);
+  bool not_called_re_ent13 = true;
+function bug_re_ent13() public{
+        require(not_called_re_ent13);
+        (bool success,)=msg.sender.call.value(1 ether)("");
+        if( ! success ){
+            revert();
+        }
+        not_called_re_ent13 = false;
+    }
+  event Burn(address indexed _burner, uint256 value);
+
+}
 """
 ]
