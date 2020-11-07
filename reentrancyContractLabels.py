@@ -1,4 +1,10 @@
 labels = [
+# Hacking Distributed Ed. Example - https://hackingdistributed.com/2016/07/13/reentrancy-woes/
+[
+    0,
+    0,
+    1
+],
 # PERSONAL_BANK - https://github.com/smartbugs/smartbugs/blob/master/dataset/reentrancy/0x01f8c4e3fa3edeb29e514cba738d87ce8c091d3f.sol
 [
     0,
@@ -375,171 +381,245 @@ labels = [
     0,
     1
 ],
-# SolidiFI 39 - https://github.com/smartbugs/SolidiFI-benchmark/blob/master/buggy_contracts/Re-entrancy/buggy_39.sol
-[
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    0,
-    1,
-    1,
-    1,
-    0,
-    1,
-    0,
-    1 
-],
-# SolidiFI 2 - https://github.com/ltchang2019/SolidiFI-benchmark/blob/master/buggy_contracts/Re-entrancy/buggy_2.sol
-[
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1
-],
-# SolidiFI 4 - https://github.com/ltchang2019/SolidiFI-benchmark/blob/master/buggy_contracts/Re-entrancy/buggy_4.sol
-[
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1
-],
-# SolidiFI 10 - https://github.com/ltchang2019/SolidiFI-benchmark/blob/master/buggy_contracts/Re-entrancy/buggy_10.sol
-[
-    1,
-    1,
-    1,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1
-],
-# SolidiFI 13 - https://github.com/ltchang2019/SolidiFI-benchmark/blob/master/buggy_contracts/Re-entrancy/buggy_13.sol
-[
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1 
-],
+# # SolidiFI 39 - https://github.com/smartbugs/SolidiFI-benchmark/blob/master/buggy_contracts/Re-entrancy/buggy_39.sol
+# [
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     0,
+#     1,
+#     1,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1 
+# ],
+# # SolidiFI 2 - https://github.com/ltchang2019/SolidiFI-benchmark/blob/master/buggy_contracts/Re-entrancy/buggy_2.sol
+# [
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1
+# ],
+# # SolidiFI 4 - https://github.com/ltchang2019/SolidiFI-benchmark/blob/master/buggy_contracts/Re-entrancy/buggy_4.sol
+# [
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1
+# ],
+# # SolidiFI 10 - https://github.com/ltchang2019/SolidiFI-benchmark/blob/master/buggy_contracts/Re-entrancy/buggy_10.sol
+# [
+#     1,
+#     1,
+#     1,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1
+# ],
+# # SolidiFI 13 - https://github.com/ltchang2019/SolidiFI-benchmark/blob/master/buggy_contracts/Re-entrancy/buggy_13.sol
+# [
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1 
+# ],
 # SolidiFI 16 - https://github.com/ltchang2019/SolidiFI-benchmark/blob/master/buggy_contracts/Re-entrancy/buggy_16.sol
+# [
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     0,
+#     1,
+#     1,
+#     1,
+#     1
+# ],
+# Consensys Safe Example - https://consensys.github.io/smart-contract-best-practices/known_attacks/
 [
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
+    0
+],
+# Consensys Cross Function Safe - https://consensys.github.io/smart-contract-best-practices/known_attacks/
+[
     0,
-    1,
+    0
+],
+# SimpleAuction (Docs) - https://solidity.readthedocs.io/en/v0.4.24/solidity-by-example.html
+[
     0,
-    1,
     0,
-    1,
+    0
+],
+# Solidity Security Considerations (Docs) - https://solidity.readthedocs.io/en/v0.4.24/security-considerations.html
+[
+    0
+],
+# Aave LendingPoolCore Examples - https://github.com/aave/aave-protocol/blob/master/contracts/lendingpool/LendingPoolCore.sol
+[
     0,
-    1,
     0,
-    1,
     0,
-    1,
     0,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1,
-    1,
-    1,
-    1
+],
+# Aave FlashLoanReceiver Example - https://github.com/aave/aave-protocol/blob/master/contracts/flashloan/base/FlashLoanReceiverBase.sol
+[
+    0
+],
+# Aave TokenDistributor Example - https://github.com/aave/aave-protocol/blob/master/contracts/fees/TokenDistributor.sol
+[
+    0
+],
+# EtherDelta Example - https://github.com/etherdelta/smart_contract/blob/master/etherdelta.sol
+[
+    0
+],
+# 0x MixinProtocolFees Example - https://github.com/0xProject/0x-monorepo/blob/development/contracts/exchange/contracts/src/MixinProtocolFees.sol
+[
+    0
+],
+# Argent Multisig Example - https://github.com/argentlabs/argent-contracts/blob/develop/contracts-legacy/v1.6.0/contracts/infrastructure/MultiSigWallet.sol
+[
+    0
+],
+# Origin Token Example - https://github.com/OriginProtocol/origin/blob/master/packages/contracts/contracts/token/OriginToken.sol
+[
+    0
+],
+# Uniswap FlashSwap Example - https://github.com/Uniswap/uniswap-v2-periphery/blob/master/contracts/examples/ExampleFlashSwap.sol
+[
+    0
+],
+# Hacking Distributed Ed. Example [FIXED] - https://hackingdistributed.com/2016/07/13/reentrancy-woes/
+[
+    0
+],
+# PERSONAL_BANK [FIXED] - https://github.com/smartbugs/smartbugs/blob/master/dataset/reentrancy/0x01f8c4e3fa3edeb29e514cba738d87ce8c091d3f.sol
+[
+    0
+],
+# PrivateBank [FIXED] - https://github.com/smartbugs/smartbugs/blob/master/dataset/reentrancy/0x23a91059fdc9579a9fbd0edc5f2ea0bfdb70deb4.sol
+[
+    0
+],
+# Ownable [FIXED] - https://github.com/smartbugs/smartbugs/blob/master/dataset/reentrancy/0x627fa62ccbb1c1b04ffaecd72a53e37fc0e17839.sol
+[
+    0
+],
+# X_WALLET [FIXED]- https://github.com/smartbugs/smartbugs/blob/master/dataset/reentrancy/0x93c32845fae42c83a70e5f06214c8433665c2ab5.sol
+[
+    0
 ]
 ]
